@@ -2,4 +2,5 @@ Flask
 numpy
 tensorflow
 gunicorn
+pytest  
 
