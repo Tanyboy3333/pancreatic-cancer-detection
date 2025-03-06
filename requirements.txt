@@ -1,8 +1,9 @@
 Flask
 numpy
-tensorflow==YOUR_VERSION  # Replace with the version you found
+tensorflow==2.9.1  # Example, use the version from Step 1
 gunicorn
 pytest
+
 
  
 
