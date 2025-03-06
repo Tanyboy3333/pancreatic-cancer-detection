@@ -25,7 +25,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
+          
       - name: Run unit tests
         run: |
           pytest tests/
@@ -53,13 +53,8 @@ jobs:
     needs: docker-build
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Deploy to Heroku
+      - name: Trigger Render Deployment
         env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: |
-          heroku container:login
-          heroku container:push web --app your-heroku-app-name
-          heroku container:release web --app your-heroku-app-name
+          curl -X POST "$RENDER_DEPLOY_HOOK_URL"
