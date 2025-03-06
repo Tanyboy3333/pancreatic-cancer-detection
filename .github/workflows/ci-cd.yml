@@ -45,8 +45,8 @@ jobs:
       - name: Push to DockerHub
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-          docker tag flask-ml-app your_dockerhub_username/flask-ml-app
-          docker push your_dockerhub_username/flask-ml-app
+          docker tag flask-ml-app tanveer2000/flask-ml-app
+          docker push tanveer2000/flask-ml-app
 
   deploy:
     runs-on: ubuntu-latest
