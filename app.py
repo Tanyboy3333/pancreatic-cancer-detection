@@ -1,34 +1,49 @@
-import os
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, render_template, jsonify
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import load_model
+from PIL import Image
+import io
 
-# Initialize Flask app
 app = Flask(__name__)
 
 # Load the trained model
-model_path = os.path.join(os.path.dirname(__file__), 'cancer_model.h5')
-model = load_model(model_path)  # Load the correct .h5 file
+model = load_model("cancer_model.h5")
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+# Define allowed image extensions
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "tiff"}
 
-@app.route('/predict', methods=['POST'])
-def predict():
-    try:
-        data = [float(x) for x in request.form.values()]
-        final_features = np.array([data])
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
-        prediction = model.predict(final_features)
-        predicted_class = int(np.argmax(prediction, axis=1)[0])
+def preprocess_image(image):
+    """Preprocess image for the model"""
+    image = image.resize((128, 128))  # Resize to model input size
+    image = np.array(image) / 255.0  # Normalize
+    image = np.expand_dims(image, axis=0)  # Add batch dimension
+    return image
 
-        return jsonify({'prediction': predicted_class})
-    
-    except Exception as e:
-        return jsonify({'error': str(e)})
+@app.route("/", methods=["GET", "POST"])
+def index():
+    if request.method == "POST":
+        if "file" not in request.files:
+            return jsonify({"error": "No file part"})
+
+        file = request.files["file"]
+
+        if file.filename == "":
+            return jsonify({"error": "No selected file"})
+
+        if file and allowed_file(file.filename):
+            image = Image.open(io.BytesIO(file.read())).convert("RGB")
+            processed_image = preprocess_image(image)
+
+            prediction = model.predict(processed_image)
+            result = "Cancerous" if prediction[0][0] > 0.5 else "Non-Cancerous"
+
+            return jsonify({"prediction": result})
+
+    return render_template("index.html")
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=5000)
