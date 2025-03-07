@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline for Flask App
 
 on:
   push:
@@ -10,12 +10,14 @@ on:
 
 jobs:
   test:
+    name: Run Unit Tests
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up Python
+      - name: Set Up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.8'
@@ -27,18 +29,14 @@ jobs:
         run: python -m unittest discover tests
 
   deploy:
+    name: Deploy to Render
     needs: test
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Deploy to Render
-        env:
-          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+      - name: Trigger Render Deployment
         run: |
-          curl -X POST "https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys" \
-               -H "Authorization: Bearer $RENDER_API_KEY" \
-               -H "Content-Type: application/json" \
-               -d '{}'
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
