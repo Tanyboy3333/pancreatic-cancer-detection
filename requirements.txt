@@ -3,6 +3,8 @@ tf-nightly
 keras==3.8.0
 numpy
 Pillow
+gunicorn
+
 
 
 
