@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template, jsonify
+import os
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.models import load_model
@@ -7,15 +8,12 @@ import io
 
 app = Flask(__name__)
 
-# ✅ Only set memory growth if a GPU is available
-physical_devices = tf.config.list_physical_devices("GPU")
-if physical_devices:  # Only applies if GPU exists
-    tf.config.experimental.set_memory_growth(physical_devices[0], True)
+# ✅ Suppress TensorFlow logs & optimize CPU usage
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"  # Reduce TensorFlow log spam
+os.environ["TF_INTER_OP_PARALLELISM_THREADS"] = "1"
+os.environ["TF_INTRA_OP_PARALLELISM_THREADS"] = "1"
 
-# ✅ Load the trained model
-model = load_model("cancer_model.h5")
-
-# Define allowed image extensions
+# ✅ Define allowed image extensions
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "tiff"}
 
 def allowed_file(filename):
@@ -28,27 +26,39 @@ def preprocess_image(image):
     image = np.expand_dims(image, axis=0)  # Add batch dimension
     return image
 
+# ✅ Load model lazily to reduce memory usage
+def get_model():
+    global model
+    if "model" not in globals():
+        model = load_model("cancer_model.h5")  # Load model only when needed
+    return model
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
         if "file" not in request.files:
-            return jsonify({"error": "No file part"})
+            return jsonify({"error": "No file part"}), 400
 
         file = request.files["file"]
 
         if file.filename == "":
-            return jsonify({"error": "No selected file"})
+            return jsonify({"error": "No selected file"}), 400
 
         if file and allowed_file(file.filename):
-            image = Image.open(io.BytesIO(file.read())).convert("RGB")
-            processed_image = preprocess_image(image)
+            try:
+                image = Image.open(io.BytesIO(file.read())).convert("RGB")
+                processed_image = preprocess_image(image)
 
-            prediction = model.predict(processed_image)
-            result = "Cancerous" if prediction[0][0] > 0.5 else "Non-Cancerous"
+                model = get_model()  # ✅ Load model only when needed
+                prediction = model.predict(processed_image)
+                result = "Cancerous" if prediction[0][0] > 0.5 else "Non-Cancerous"
 
-            return jsonify({"prediction": result})
+                return jsonify({"prediction": result}), 200
+
+            except Exception as e:
+                return jsonify({"error": str(e)}), 500
 
     return render_template("index.html")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
