@@ -1,6 +1,6 @@
 Flask
 tensorflow==2.13.1  # Latest available version from your error log
-keras==2.15.0
+keras==2.13.1
 numpy
 Pillow
 
