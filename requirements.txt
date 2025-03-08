@@ -1,5 +1,5 @@
 Flask
-tensorflow==2.18.0
+tf-nightly
 keras==3.8.0
 numpy
 Pillow
