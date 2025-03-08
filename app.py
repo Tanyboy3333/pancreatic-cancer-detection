@@ -8,7 +8,7 @@ import io
 app = Flask(__name__)
 
 # Load the trained model
-model = load_model("cancer_model.keras")
+model = load_model("cancer_model.h5")
 
 
 # Define allowed image extensions
