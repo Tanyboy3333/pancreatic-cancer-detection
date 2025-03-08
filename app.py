@@ -7,16 +7,13 @@ import io
 
 app = Flask(__name__)
 
-
-# Limit TensorFlow memory growth (prevents Render from killing the process)
-physical_devices = tf.config.list_physical_devices('CPU')
-if physical_devices:
+# ✅ Only set memory growth if a GPU is available
+physical_devices = tf.config.list_physical_devices("GPU")
+if physical_devices:  # Only applies if GPU exists
     tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
-
-# Load the trained model
+# ✅ Load the trained model
 model = load_model("cancer_model.h5")
-
 
 # Define allowed image extensions
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "tiff"}
