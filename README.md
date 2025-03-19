@@ -3,29 +3,6 @@
 
 This project implements a Convolutional Neural Network (CNN) model to detect pancreatic cancer from CT scan images. The trained model is deployed using Flask, a CI/CD pipeline (GitHub Actions) automates testing and deployment, and the application is hosted on Render with a user-friendly UI for real-time predictions.
 
-📂 Project Structure
-graphql
-Copy
-Edit
-📁 Pancreatic-Cancer-Detection
-│── 📂 static                  # Frontend assets (CSS, JavaScript)
-│   ├── 📂 css
-│   │   ├── styles.css         # Styling for the web app
-│   ├── 📂 js
-│   │   ├── script.js          # Client-side interactivity
-│── 📂 templates               # HTML files for UI
-│   ├── index.html             # Main page for file upload & results
-│── 📂 tests                   # Unit tests
-│   ├── test_app.py            # Automated test cases for Flask app
-│── cancer_model.h5            # Trained TensorFlow model
-│── app.py                     # Flask backend for inference
-│── Dockerfile                 # Containerization setup for deployment
-│── requirements.txt           # List of dependencies
-│── .github/
-│   ├── workflows/
-│   │   ├── cicd.yaml          # CI/CD pipeline for automated testing & deployment
-│── README.md                  # Project documentation (this file)
-
 🚀 How It Works
 1️⃣ Model Training & Saving
 A CNN model was trained using CT scan images to classify them as cancerous or non-cancerous.
