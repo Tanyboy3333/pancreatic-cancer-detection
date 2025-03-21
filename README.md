@@ -27,33 +27,6 @@ If tests pass, the app is deployed to Render using a webhook.
 
 
 The app is now publicly accessible via Render.
-🛠️ Installation & Running Locally
-
-1️⃣ Clone the Repository
-
-
-
-git clone https://github.com/yourusername/Pancreatic-Cancer-Detection.git
-cd Pancreatic-Cancer-Detection
-
-
-2️⃣ Create a Virtual Environment & Install Dependencies
-
-
-python -m venv venv
-source venv/bin/activate   # For Mac/Linux
-venv\Scripts\activate      # For Windows
-
-pip install -r requirements.txt
-
-
-3️⃣ Run the Flask App
-
-
-python app.py
-
-
-The app will be available at http://127.0.0.1:5000/.
 
 
 🛠️ Deployment on Render
